@@ -48,7 +48,9 @@ app.use((err, req, res, next) => {
 
 //create model. keep in mind, keys that will appear later were not added initially (may cause trouble).
 let userSchema = new mongoose.Schema ({
-  username: String
+  username: String,
+  count: Number,
+  log: []//may need to refactor this with an object
 })
 
 let User = mongoose.model('User', userSchema)
@@ -93,9 +95,11 @@ app.post('/api/exercise/add', (req,res,next)=> {
   //find by id, add description, duration, and if there's no date retrieve-&-add current date.
   console.log("made it this far")
   console.log(req.body)
+  console.log(req.body.description)
   console.log("before is 1st req.body")
   User.findOneAndUpdate({_id:req.body.userId}, 
-                        //{description: req.body.description},
+                        {username: "yep2"},
+                        //{"description": req.body.description},
                         //{duration: req.body.duration},
                         {new: true},
                         (err, data)=> {
