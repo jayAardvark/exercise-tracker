@@ -86,6 +86,40 @@ app.get('/api/exercise/users', (req,res,next)=> {
     }res.json(data);
     next();
   })
+});
+
+//add exercises 
+app.post('/api/exercise/add', (req,res,next)=> {
+  //find by id, add description, duration, and if there's no date retrieve-&-add current date.
+  console.log("made it this far")
+  console.log(req.body)
+  console.log("before is 1st req.body")
+  User.findOneAndUpdate({_id:req.body.userId}, 
+                        //{description: req.body.description},
+                        //{duration: req.body.duration},
+                        {new: true},
+                        (err, data)=> {
+    if (err) {
+        console.log("made it this far 2")
+      console.log("error")
+    }else {
+        console.log("made it this far 3")
+      console.log(data);
+      /*data.description = req.body.description;
+      data.duration = req.body.duration;
+      data.date = req.body.date;*/
+      data.save((err,data)=> {
+        if (err) {
+          console.log("error saving")
+        }else {
+            console.log("made it this far 4")
+          //res.json(data)
+          console.log(data)
+        }
+      })
+    }
+  })
+  next();
 })
 
 
