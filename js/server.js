@@ -6,6 +6,8 @@ const cors = require('cors')
 
 const mongoose = require('mongoose')
 mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track', {useMongoClient: true} )
+//added this as per log but didn't resolve "error saving" log
+mongoose.Promise = require('bluebird')
 
 app.use(cors())
 
@@ -50,7 +52,8 @@ app.use((err, req, res, next) => {
 let userSchema = new mongoose.Schema ({
   username: String,
   count: Number,
-  log: []//may need to refactor this with an object
+  //log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
+  log: []
 })
 
 let User = mongoose.model('User', userSchema)
@@ -97,28 +100,27 @@ app.post('/api/exercise/add', (req,res,next)=> {
   console.log(req.body)
   console.log(req.body.description)
   console.log("before is 1st req.body")
-  User.findOneAndUpdate({_id:req.body.userId}, 
-                        {username: "yep2"},
-                        //{"description": req.body.description},
-                        //{duration: req.body.duration},
-                        {new: true},
-                        (err, data)=> {
+  let description = req.body.description;
+  let duration = req.body.duration;
+  let date = req.body.date;
+  User.findById({_id: req.body.userId},(err, data)=> {
     if (err) {
         console.log("made it this far 2")
       console.log("error")
     }else {
-        console.log("made it this far 3")
+      console.log("made it this far 3")
       console.log(data);
-      /*data.description = req.body.description;
-      data.duration = req.body.duration;
-      data.date = req.body.date;*/
+      data.log.push({description: description, duration: duration, date: date});
+      console.log(data);
+      console.log("above is post-push");
+      //data.markModified('log');
       data.save((err,data)=> {
         if (err) {
-          console.log("error saving")
+          console.log("error saving");
         }else {
-            console.log("made it this far 4")
+            console.log("made it this far 4");
           //res.json(data)
-          console.log(data)
+          console.log(data);
         }
       })
     }
