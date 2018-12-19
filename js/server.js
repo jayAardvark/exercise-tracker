@@ -52,8 +52,8 @@ app.use((err, req, res, next) => {
 let userSchema = new mongoose.Schema ({
   username: String,
   count: Number,
-  //log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
-  log: []
+  log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
+  //log: [{description: String}]
 })
 
 let User = mongoose.model('User', userSchema)
@@ -96,24 +96,25 @@ app.get('/api/exercise/users', (req,res,next)=> {
 //add exercises 
 app.post('/api/exercise/add', (req,res,next)=> {
   //find by id, add description, duration, and if there's no date retrieve-&-add current date.
-  console.log("made it this far")
-  console.log(req.body)
-  console.log(req.body.description)
-  console.log("before is 1st req.body")
+  console.log("made it this far");
+  console.log(req.body);
+  console.log(req.body.description);
+  console.log("before is 1st req.body");
   let description = req.body.description;
   let duration = req.body.duration;
   let date = req.body.date;
   User.findById({_id: req.body.userId},(err, data)=> {
     if (err) {
-        console.log("made it this far 2")
-      console.log("error")
+        console.log("made it this far 2");
+      console.log("error");
     }else {
-      console.log("made it this far 3")
+      console.log("made it this far 3");
       console.log(data);
       data.log.push({description: description, duration: duration, date: date});
+      //data.log.push({description: description})
       console.log(data);
       console.log("above is post-push");
-      //data.markModified('log');
+      data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
           console.log("error saving");
