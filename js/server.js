@@ -109,14 +109,17 @@ app.post('/api/exercise/add', (req,res,next)=> {
       console.log("error");
     }else {
       console.log("made it this far 3");
-      console.log(data);
-      data.log.push({description: description, duration: duration, date: date});
+      //console.log(data);
+      //data.log.push({description: description, duration: duration, date: date});
+      data.log = data.log.concat({description: description, duration: duration, date: date});
       //data.log.push({description: description})
       console.log(data);
       console.log("above is post-push");
-      data.markModified(data.log);
+      //data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
+          console.log("***");
+          console.log(err);
           console.log("error saving");
         }else {
             console.log("made it this far 4");
