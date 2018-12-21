@@ -52,8 +52,8 @@ app.use((err, req, res, next) => {
 let userSchema = new mongoose.Schema ({
   username: String,
   count: Number,
-  log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
-  //log: [{description: String}]
+  //log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
+  log: []
 })
 
 let User = mongoose.model('User', userSchema)
@@ -103,6 +103,12 @@ app.post('/api/exercise/add', (req,res,next)=> {
   let description = req.body.description;
   let duration = req.body.duration;
   let date = req.body.date;
+  //figure logic for if "date" field is empty
+  if (date == '') {
+    console.log("no date");
+    let d = new Date();
+    date = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+  }
   User.findById({_id: req.body.userId},(err, data)=> {
     if (err) {
         console.log("made it this far 2");
@@ -115,7 +121,7 @@ app.post('/api/exercise/add', (req,res,next)=> {
       //data.log.push({description: description})
       console.log(data);
       console.log("above is post-push");
-      //data.markModified(data.log);
+      data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
           console.log("***");
@@ -133,9 +139,3 @@ app.post('/api/exercise/add', (req,res,next)=> {
 })
 
 
-
-
-
-const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
