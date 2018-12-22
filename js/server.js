@@ -61,8 +61,8 @@ let User = mongoose.model('User', userSchema)
 //get username and return object with name and _id
 
 app.post('/api/exercise/new-user', (req,res,next)=> {
-  let userName = req.body.username;
-  userName = new User ({
+  /*let userName = req.body.username; //weird redundancy(?) I had */
+  let userName = new User ({
     username: req.body.username
   });
   //const createUser = function(done) {
