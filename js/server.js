@@ -105,6 +105,9 @@ app.post('/api/exercise/add', (req,res,next)=> {
   let description = req.body.description;
   let duration = req.body.duration;
   let date = req.body.date;
+  let dateArray = [];
+  //variable below is meant for res.json when uploading an exercise
+  let jsonDate;
   //figure logic for if "date" field is empty
   if (date == '') {
     console.log("no date");
@@ -112,6 +115,19 @@ app.post('/api/exercise/add', (req,res,next)=> {
     console.log("*******DATE*******")
     let d = new Date();
     date = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+    //this is all a MESS!!! determine this logic AFTER accounting for dates actually typed by user
+    jsonDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    jsonDate = jsonDate.toDateString()
+    console.log(jsonDate)
+    console.log("***JSONDATE***")
+  }else {
+    jsonDate = req.body.date.split("-");
+    console.log(jsonDate)
+    console.log("****JSONDATE****")
+    //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
+    jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
+    jsonDate = jsonDate.toDateString();
+    console.log(jsonDate);
   }
   User.findById({_id: req.body.userId},(err, data)=> {
     if (err) {
