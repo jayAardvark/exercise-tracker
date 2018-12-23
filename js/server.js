@@ -97,15 +97,19 @@ app.get('/api/exercise/users', (req,res,next)=> {
 app.post('/api/exercise/add', (req,res,next)=> {
   //find by id, add description, duration, and if there's no date retrieve-&-add current date.
   console.log("made it this far");
+  /*
   console.log(req.body);
   console.log(req.body.description);
   console.log("before is 1st req.body");
+  */
   let description = req.body.description;
   let duration = req.body.duration;
   let date = req.body.date;
   //figure logic for if "date" field is empty
   if (date == '') {
     console.log("no date");
+    console.log(Date());
+    console.log("*******DATE*******")
     let d = new Date();
     date = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
   }
@@ -119,8 +123,10 @@ app.post('/api/exercise/add', (req,res,next)=> {
       //data.log.push({description: description, duration: duration, date: date});
       data.log = data.log.concat({description: description, duration: duration, date: date});
       //data.log.push({description: description})
+      /*
       console.log(data);
       console.log("above is post-push");
+      */
       data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
