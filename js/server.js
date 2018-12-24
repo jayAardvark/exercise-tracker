@@ -119,17 +119,24 @@ app.post('/api/exercise/add', (req,res,next)=> {
     jsonDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     jsonDate = jsonDate.toDateString()
     console.log(jsonDate)
+    console.log(req)
     console.log("***JSONDATE***")
   }else {
     jsonDate = req.body.date.split("-");
     console.log(jsonDate)
-    console.log("****JSONDATE****")
     //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
     jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
     jsonDate = jsonDate.toDateString();
+    //res.json({"username": req.body.username, "date": jsonDate});
     console.log(jsonDate);
+    console.log("****JSONDATE****")
   }
   User.findById({_id: req.body.userId},(err, data)=> {
+    //try adding res.json here
+    console.log(data.username);
+    console.log(data);
+    //res.json({"data":data})
+    console.log("***************************")
     if (err) {
         console.log("made it this far 2");
       console.log("error");
