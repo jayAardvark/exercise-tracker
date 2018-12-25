@@ -48,15 +48,26 @@ app.use((err, req, res, next) => {
 
 //my code starts here
 
-//create model. keep in mind, keys that will appear later were not added initially (may cause trouble).
+//create models. keep in mind, keys that will appear later were not added initially (may cause trouble).
 let userSchema = new mongoose.Schema ({
   username: String,
   count: Number,
   //log: [{description: String, duration: String, date: String}]//may need to refactor this with an object
   log: []
-})
+});
+let User = mongoose.model('User', userSchema);
 
-let User = mongoose.model('User', userSchema)
+//Think about the consequences of not including these keys here initially.
+let exerciseSchema = new mongoose.Schema ({
+  username: String,
+  description: String,
+  duration: String, //may need to change this data-type
+  _id: String,
+  date: String 
+});
+let ExerciseLog = mongoose.model('ExerciseLog', exerciseSchema);
+
+
 
 //get username and return object with name and _id
 
@@ -93,6 +104,8 @@ app.get('/api/exercise/users', (req,res,next)=> {
   })
 });
 
+
+
 //add exercises 
 app.post('/api/exercise/add', (req,res,next)=> {
   //find by id, add description, duration, and if there's no date retrieve-&-add current date.
@@ -108,35 +121,93 @@ app.post('/api/exercise/add', (req,res,next)=> {
   let dateArray = [];
   //variable below is meant for res.json when uploading an exercise
   let jsonDate;
+  let id = req.body.userId;
+  let foundUser;
+  
+  /*
+  User.findById(req.body.userId, (err, data)=> {
+    if (err){
+      console.log("error finding by ID");
+    }else {
+      let exercise = new ExerciseLog ({
+        username: data.username,
+        duration: duration,
+        //_id: String,
+        //date: Date 
+      });
+      res.json(exercise);
+      console.log(exercise);
+      console.log("****")
+    }
+  });
+  */
+  //console.log(foundUser);
+  //console.log("______________________");
+  
+  
   //figure logic for if "date" field is empty
+  
   if (date == '') {
-    console.log("no date");
-    console.log(Date());
-    console.log("*******DATE*******")
     let d = new Date();
     date = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
     //this is all a MESS!!! determine this logic AFTER accounting for dates actually typed by user
     jsonDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    jsonDate = jsonDate.toDateString()
-    console.log(jsonDate)
-    console.log(req)
-    console.log("***JSONDATE***")
+    jsonDate = jsonDate.toDateString();
+    //console.log(req);
+    //access username so as to include in res.json
+    //res.json({"description": description, "duration": duration,"_id": req.body.userId,"date": jsonDate});
   }else {
     jsonDate = req.body.date.split("-");
-    console.log(jsonDate)
     //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
     jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
     jsonDate = jsonDate.toDateString();
     //res.json({"username": req.body.username, "date": jsonDate});
     console.log(jsonDate);
-    console.log("****JSONDATE****")
-  }
+    //access username so as to include in res.json
+
+
+    //console.log(foundUser);
+    console.log("***ABOVE IS FOUNDUSER***");
+    //res.json({"description": description, "duration": duration,"_id": req.body.userId,"date": jsonDate});
+    console.log(typeof jsonDate);
+    console.log("****JSONDATE****");
+    console.log(req.body);
+  };
+  
+    User.findById(req.body.userId, (err, data, next)=> {
+      console.log(data);
+      console.log(jsonDate);
+      console.log("booooooo");
+    if (err){
+      console.log("error finding by ID");
+    }else {
+      console.log("booooooo 2");
+      //res.json("hey")
+      foundUser = data.username;
+      let exercise = new ExerciseLog ({
+        username: data.username,
+        duration: duration,
+        //_id: String,
+        date: date 
+      });
+      console.log("booooooo 3");
+      //res.json(exercise);
+      console.log(exercise);
+      console.log("****");
+    }
+//      next();
+  });
+  
+  //think about whether this section is redundant or not.  can it be combined with the above-use of findById?
   User.findById({_id: req.body.userId},(err, data)=> {
     //try adding res.json here
+    console.log(data);
+    console.log("***DATA AFTER POST***");
     console.log(data.username);
     console.log(data);
     //res.json({"data":data})
-    console.log("***************************")
+    console.log("***************************");
+
     if (err) {
         console.log("made it this far 2");
       console.log("error");
@@ -157,15 +228,15 @@ app.post('/api/exercise/add', (req,res,next)=> {
           console.log(err);
           console.log("error saving");
         }else {
-            console.log("made it this far 4");
-          //res.json(data)
+          console.log("made it this far 4");
           console.log(data);
         }
       })
     }
-  })
+  });
+  //res.json({"description":description, "duration": duration, "username": foundUser, "_id": id, "date": date});
   next();
-})
+});
 
 
 
