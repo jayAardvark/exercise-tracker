@@ -71,7 +71,7 @@ let ExerciseLog = mongoose.model('ExerciseLog', exerciseSchema);
 
 
 //get username and return object with name and _id
-app.post('/api/exercise/new-user', (req,res,next)=> {
+app.post('/api/exercise/new-user', (req,res)=> {
   let userName = new User ({
     username: req.body.username
   });
@@ -84,21 +84,19 @@ app.post('/api/exercise/new-user', (req,res,next)=> {
     
     });
   res.json(userName);
-  next();
 });
 
 //create GET that returns array of all users in DB
-app.get('/api/exercise/users', (req,res,next)=> {
+app.get('/api/exercise/users', (req,res)=> {
   User.find((err, data)=> {
     if(err) {
       console.log('error');
     }res.json(data);
-    next();
   })
 });
 
 //add exercises
-app.post('/api/exercise/add', (req,res,next)=> {
+app.post('/api/exercise/add', (req,res) => {
   let description = req.body.description;
   let duration = req.body.duration;
   let id = req.body.userId;
@@ -136,23 +134,20 @@ app.post('/api/exercise/add', (req,res,next)=> {
       });
     }
   });
-  next();
 });
 
 //get exercise log and count
-app.get('/api/exercise/log', (req,res,next)=>{
-  let user = req.query.userid;
+app.get('/api/exercise/log', (req,res)=>{
+  let user = req.query.userId;
   User.findById(user,(err,data)=> {
     if (err) {
       console.log("error");
-      return next(err);
+      //return next(err);
     }else {
-      console.log(data);
-      res.json(data);
+      res.json({"_id": data._id, "username": data.username, "count": data.log.length, "log": data.log});
     }
   });
-  next();
-})
+});
 
 
 
