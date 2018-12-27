@@ -118,7 +118,7 @@ app.post('/api/exercise/add', (req,res,next)=> {
     if (err) {
       console.log("error");
     }else {
-      console.log(data.username);
+      //console.log(data.username);
       userName = data.username;
       //res.json({"username": userName, "description": description, "duration": duration, "_id": id, 'date': date});
       data.log = data.log.concat({description: description, duration: duration, date: date});
@@ -127,15 +127,31 @@ app.post('/api/exercise/add', (req,res,next)=> {
       data.save((err,data)=> {
         if (err) {
           console.log("***");
-          console.log(err);
+          //console.log(err);
           console.log("error saving");
         }else {
           console.log("****");
-          console.log(data);
+          //console.log(data);
         }
       });
     }
   });
+  next();
+});
+
+//get exercise log and count
+app.get('/api/exercise/log', (req,res,next)=>{
+  let user = req.query.userid;
+  User.findById(user,(err,data)=> {
+    if (err) {
+      console.log("error");
+      return next(err);
+    }else {
+      console.log(data);
+      res.json(data);
+    }
+  });
+  next();
 })
 
 
