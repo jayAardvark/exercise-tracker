@@ -149,6 +149,21 @@ app.get('/api/exercise/log', (req,res)=>{
   });
 });
 
+/*incorporate this into the /log endpoint logic
+
+var log = [{"description":"jog","duration":10,"date":"2018-12-01"},
+{"description":"jumping jack","duration":10,"date":"2018-12-10"},
+{"description":"jog","duration":10,"date":"2018-12-15"},
+{"description":"jog","duration":10,"date":"2018-12-20"},
+{"description":"jog","duration":10,"date":"2018-12-27"}];
+
+
+
+var filteredList = log.filter((y)=> (y.date) >= "2018-12-02" && (y.date) <= "2018-12-27" );
+
+console.log(filteredList); 
+*/
+
 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
