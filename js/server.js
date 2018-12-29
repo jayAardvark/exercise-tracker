@@ -152,21 +152,37 @@ app.get('/api/exercise/log', (req,res)=>{
   let from = req.query.from;
   let to = req.query.to;
   let limit = req.query.limit;
-  console.log(limit);
   User.findById(user,(err,data)=> {
     if (err) {
       console.log("error");
     }else if((from == " " || from == null) || (to == " " || to == null)){
+      //logic for limiting length of log-array
+      if (limit == undefined || limit == null || limit == "") {
+        //may need to map data.log to polish up the res.json
+        res.json({"_id": data._id, "username": data.username, "count": data.log.length, "log": data.log});
+      }while (limit < data.log.length) {
+        //will using pop() here actually alter the log array stored in the database if nothing is saved?
+        data.log.pop();
+      }
       //may need to map data.log to polish up the res.json
       res.json({"_id": data._id, "username": data.username, "count": data.log.length, "log": data.log});
     }else {
       //create logic for filtering exercise log by date
       let dataLog = data.log;
       let filterLog = dataLog.filter((y)=> (y.date) > from && (y.date) < to);
+      //logic for limiting length of log-array
+      if (limit == undefined || limit == null || limit == "") {
+        res.json({"_id": data._id, "username": data.username, "count": filterLog.length, "log": filterLog});
+      }while (limit < filterLog.length) {
+        filterLog.pop();
+      }
       res.json({"_id": data._id, "username": data.username, "count": filterLog.length, "log": filterLog});
     }
   });
 });
+
+
+
 
 
 
