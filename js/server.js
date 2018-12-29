@@ -104,11 +104,30 @@ app.post('/api/exercise/add', (req,res) => {
   let date;
   let jsonDate;
   if (req.body.date == "" || req.body.date == null) {
-    date = new Date();
+    let generatedDate = new Date();
+    let theYear = generatedDate.getFullYear().toString();
+    let theMonth = generatedDate.getMonth();
+    //must add one here because getMonth is 0-11.  Note: 1 is subtracted in "jsonDate" below
+    theMonth += 1;
+    theMonth = theMonth.toString();
+    console.log(theMonth);
+    let theDate = generatedDate.getDate().toString();
+    date = theYear.concat("-", theMonth, "-", theDate);
     console.log(date);
-    jsonDate = date.toDateString();
+    console.log("date here here here");
+    jsonDate = date.split("-");
+    jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
+    jsonDate = jsonDate.toDateString();
+    console.log(jsonDate);
+    console.log("DATE DATE DATE WITHOUT INPUT");
+    
+    //date = new Date();
+    //console.log(date);
+    //jsonDate = date.toDateString();
   }else {
     date = req.body.date;
+    console.log(date);
+    console.log("date here here here");
     //this variable of jsonDate is created so that the res.json contains a format that is, e.g., "Sat Dec 01 2018"
     jsonDate = req.body.date.split("-");
     //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
@@ -168,3 +187,4 @@ app.get('/api/exercise/log', (req,res)=>{
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
+
