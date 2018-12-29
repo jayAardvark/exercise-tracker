@@ -113,21 +113,12 @@ app.post('/api/exercise/add', (req,res) => {
     console.log(theMonth);
     let theDate = generatedDate.getDate().toString();
     date = theYear.concat("-", theMonth, "-", theDate);
-    console.log(date);
-    console.log("date here here here");
+    //this variable of jsonDate is created so that the res.json contains a format that is, e.g., "Sat Dec 01 2018"
     jsonDate = date.split("-");
     jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
     jsonDate = jsonDate.toDateString();
-    console.log(jsonDate);
-    console.log("DATE DATE DATE WITHOUT INPUT");
-    
-    //date = new Date();
-    //console.log(date);
-    //jsonDate = date.toDateString();
   }else {
     date = req.body.date;
-    console.log(date);
-    console.log("date here here here");
     //this variable of jsonDate is created so that the res.json contains a format that is, e.g., "Sat Dec 01 2018"
     jsonDate = req.body.date.split("-");
     //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
@@ -140,17 +131,14 @@ app.post('/api/exercise/add', (req,res) => {
     }else {
       //console.log(data.username);
       userName = data.username;
-      //res.json({"username": userName, "description": description, "duration": duration, "_id": id, 'date': date});
       data.log = data.log.concat({description: description, duration: duration, date: date});
       res.json({"username": userName, "description": description, "duration": duration, "_id": id, "date": jsonDate});
       data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
-          console.log("***");
-          //console.log(err);
           console.log("error saving");
         }else {
-          console.log("****");
+          console.log("saved");
           //console.log(data);
         }
       });
@@ -163,20 +151,18 @@ app.get('/api/exercise/log', (req,res)=>{
   let user = req.query.userId;
   let from = req.query.from;
   let to = req.query.to;
-  //add variable for limit parameter here
+  let limit = req.query.limit;
+  console.log(limit);
   User.findById(user,(err,data)=> {
     if (err) {
       console.log("error");
-      //return next(err);
     }else if((from == " " || from == null) || (to == " " || to == null)){
-      console.log(data.log);
-      console.log("data.log above");
       //may need to map data.log to polish up the res.json
       res.json({"_id": data._id, "username": data.username, "count": data.log.length, "log": data.log});
     }else {
       //create logic for filtering exercise log by date
       let dataLog = data.log;
-      let filterLog = dataLog.filter((y)=> (y.date) > from && (y.date) < to );
+      let filterLog = dataLog.filter((y)=> (y.date) > from && (y.date) < to);
       res.json({"_id": data._id, "username": data.username, "count": filterLog.length, "log": filterLog});
     }
   });
@@ -187,4 +173,3 @@ app.get('/api/exercise/log', (req,res)=>{
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
-
