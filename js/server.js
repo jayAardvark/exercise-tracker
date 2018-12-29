@@ -102,15 +102,18 @@ app.post('/api/exercise/add', (req,res) => {
   let id = req.body.userId;
   let userName;
   let date;
+  let jsonDate;
   if (req.body.date == "" || req.body.date == null) {
     date = new Date();
-    date = date.toDateString();
+    console.log(date);
+    jsonDate = date.toDateString();
   }else {
     date = req.body.date;
-    date = req.body.date.split("-");
+    //this variable of jsonDate is created so that the res.json contains a format that is, e.g., "Sat Dec 01 2018"
+    jsonDate = req.body.date.split("-");
     //note that the 2nd argument below must be subtracted by 1 to account for months starting with Jan = "0", Feb = "1", etc...
-    date = new Date(date[0],date[1]-1,date[2]);
-    date = date.toDateString();
+    jsonDate = new Date(jsonDate[0],jsonDate[1]-1,jsonDate[2]);
+    jsonDate = jsonDate.toDateString();
   }
   User.findById(id, (err, data)=> {
     if (err) {
@@ -120,7 +123,7 @@ app.post('/api/exercise/add', (req,res) => {
       userName = data.username;
       //res.json({"username": userName, "description": description, "duration": duration, "_id": id, 'date': date});
       data.log = data.log.concat({description: description, duration: duration, date: date});
-      res.json({"username": userName, "description": description, "duration": duration, "_id": id, "date": date});
+      res.json({"username": userName, "description": description, "duration": duration, "_id": id, "date": jsonDate});
       data.markModified(data.log);
       data.save((err,data)=> {
         if (err) {
@@ -139,30 +142,26 @@ app.post('/api/exercise/add', (req,res) => {
 //get exercise log and count
 app.get('/api/exercise/log', (req,res)=>{
   let user = req.query.userId;
+  let from = req.query.from;
+  let to = req.query.to;
+  //add variable for limit parameter here
   User.findById(user,(err,data)=> {
     if (err) {
       console.log("error");
       //return next(err);
-    }else {
+    }else if((from == " " || from == null) || (to == " " || to == null)){
+      console.log(data.log);
+      console.log("data.log above");
+      //may need to map data.log to polish up the res.json
       res.json({"_id": data._id, "username": data.username, "count": data.log.length, "log": data.log});
+    }else {
+      //create logic for filtering exercise log by date
+      let dataLog = data.log;
+      let filterLog = dataLog.filter((y)=> (y.date) > from && (y.date) < to );
+      res.json({"_id": data._id, "username": data.username, "count": filterLog.length, "log": filterLog});
     }
   });
 });
-
-/*incorporate this into the /log endpoint logic
-
-var log = [{"description":"jog","duration":10,"date":"2018-12-01"},
-{"description":"jumping jack","duration":10,"date":"2018-12-10"},
-{"description":"jog","duration":10,"date":"2018-12-15"},
-{"description":"jog","duration":10,"date":"2018-12-20"},
-{"description":"jog","duration":10,"date":"2018-12-27"}];
-
-
-
-var filteredList = log.filter((y)=> (y.date) >= "2018-12-02" && (y.date) <= "2018-12-27" );
-
-console.log(filteredList); 
-*/
 
 
 
